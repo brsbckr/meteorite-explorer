@@ -128,7 +128,7 @@ The application follows a **three-tier architecture**:
 ### Running the Application Locally
 1. **Clone the repository**
    ```sh
-   git clone https://github.com/your-repo/meteorite-explorer.git
+   git clone https://github.com/brsbckr/meteorite-explorer.git
    cd meteorite-explorer
    ```
 2. **Run the backend**
