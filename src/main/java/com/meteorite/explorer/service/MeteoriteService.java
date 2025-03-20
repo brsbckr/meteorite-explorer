@@ -3,6 +3,7 @@ package com.meteorite.explorer.service;
 import com.meteorite.explorer.model.Meteorite;
 import com.meteorite.explorer.repository.MeteoriteRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class MeteoriteService {
@@ -24,10 +26,12 @@ public class MeteoriteService {
 	private final MeteoriteRepository repository;
 
 	public Optional<Meteorite> getMeteoriteById(Long id) {
+		log.info("Getting meteorite by id: {}", id);
 		return repository.findById(id);
 	}
 
 	public Page<Meteorite> getAllMeteorites(String name, Pageable pageable) {
+		log.info("Getting all meteorites");
 		if (name != null && !name.trim().isEmpty()) {
 			return repository.findByNameContainingIgnoreCase(name, pageable);
 		}
@@ -35,33 +39,39 @@ public class MeteoriteService {
 	}
 
 	public Page<Meteorite> searchMeteorites(String name, String recclass, Integer year, String fall, Double minMass, Double maxMass, Pageable pageable) {
+		log.info("Searching meteorites by name: {}, recclass: {}, year: {}, fall: {}, minMass: {}, maxMass: {}", name, recclass, year, fall, minMass, maxMass);
 		return repository.searchMeteorites(name, recclass, year, fall, minMass, maxMass, pageable);
 	}
 
 	public Map<Integer, Long> getMeteoriteTrends() {
+		log.info("Getting meteorite trends");
 		return repository.getMeteoriteTrends()
 				.stream()
 				.collect(Collectors.toMap(o -> (Integer) o[0], o -> (Long) o[1]));
 	}
 
 	public Map<String, Long> getMassDistribution() {
+		log.info("Getting mass distribution");
 		return repository.getMassDistribution()
 				.stream()
 				.collect(Collectors.toMap(o -> (String) o[0], o -> (Long) o[1]));
 	}
 
 	public Map<String, Long> getClassificationBreakdown() {
+		log.info("Getting classification breakdown");
 		return repository.getClassificationBreakdown()
 				.stream()
 				.collect(Collectors.toMap(o -> (String) o[0], o -> (Long) o[1]));
 	}
 
 	public long count() {
+		log.info("Counting meteorites");
 		return repository.count();
 	}
 
 	@Transactional
 	public void loadMeteoriteData() {
+		log.info("Loading meteorite data");
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new ClassPathResource("Meteorite_landings.csv").getInputStream(), StandardCharsets.UTF_8))) {
 			List<Meteorite> meteorites = reader.lines().skip(1).map(line -> {
@@ -79,7 +89,7 @@ public class MeteoriteService {
 			}).toList();
 			repository.saveAll(meteorites);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error loading meteorite data", e);
 		}
 	}
 
