@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: meteorite_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: meteorite_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - meteorite_network
+
+  backend:
+    build: .
+    container_name: meteorite_backend
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/meteorite_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+    ports:
+      - "8080:8080"
+    networks:
+      - meteorite_network
+    command: ["/bin/sh", "-c", "sleep 10 && java -jar app.jar"]
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: meteorite_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - meteorite_network
+
+networks:
+  meteorite_network:
+    driver: bridge
+
+volumes:
+  pg_data:

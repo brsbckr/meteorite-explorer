@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+spring:
+  application.name: MeteoriteExplorerApplication
+  datasource:
+    url: jdbc:postgresql://localhost:5432/meteorite_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+  mvc:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+logging:
+  level:
+    org.springframework.web: DEBUG
